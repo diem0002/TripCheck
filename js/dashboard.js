@@ -199,17 +199,18 @@ function renderGastos() {
 // -------------------- Diccionario --------------------
 async function renderTraductor() {
     contenido.innerHTML = `
-        <h2>Traductor</h2>
-        <textarea id="texto-origen" placeholder="Escribí aquí..." rows="4"></textarea>
-        <div style="display:flex; gap:10px; margin:0.5rem 0;">
-            <select id="from-lang" class="select-traductor"></select>
-            <select id="to-lang" class="select-traductor"></select>
-        </div>
-        <button id="traducir-btn">Traducir</button>
-        <div class="polaroid" style="margin-top:1rem;">
-            <p id="resultado-traduccion" style="margin:0; font-weight:bold;">Resultado aparecerá aquí</p>
-        </div>
-    `;
+    <h2>Traductor</h2>
+    <textarea id="texto-origen" placeholder="Escribí aquí..." rows="4"></textarea>
+    <div style="display:flex; gap:10px; margin:0.5rem 0;">
+        <select id="from-lang" class="select-traductor"></select>
+        <select id="to-lang" class="select-traductor"></select>
+    </div>
+    <button id="traducir-btn">Traducir</button>
+    <div class="polaroid-traductor">
+        <p id="resultado-traduccion" style="margin:0; font-weight:bold;">Resultado aparecerá aquí</p>
+    </div>
+`;
+
 
     const fromSelect = document.getElementById('from-lang');
     const toSelect = document.getElementById('to-lang');

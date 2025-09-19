@@ -141,6 +141,21 @@ button:hover {
     display:flex; flex-wrap:wrap; gap:1rem; padding:1rem; 
     justify-content:center;
 }
+
+.polaroid-traductor {
+    background: white;
+    padding: 20px;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.3);
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 1rem;
+    max-width: 600px;      /* ancho máximo */
+    width: 100%;            /* se adapta al contenedor */
+    word-wrap: break-word;  /* quiebra palabras largas */
+    white-space: pre-wrap;  /* mantiene saltos de línea */
+    font-size: 1rem;
+}
+
 .polaroid { 
     background:white; 
     padding:10px 10px 20px 10px; 
