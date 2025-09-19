@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Viaje</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1 id="titulo-viaje">Viaje</h1>
+        <button onclick="window.location.href='index.html'">🏠 Volver</button>
+    </header>
+
+    <main>
+        <div class="secciones-grid">
+            <div class="seccion" onclick="abrirSeccion('equipaje')">🧳 Equipaje</div>
+            <div class="seccion" onclick="abrirSeccion('notas')">📝 Notas</div>
+            <div class="seccion" onclick="abrirSeccion('regalos')">🎁 Regalos</div>
+            <div class="seccion" onclick="abrirSeccion('gastos')">💰 Gastos</div>
+            <div class="seccion" onclick="abrirSeccion('diccionario')">💬 Diccionario</div>
+            <div class="seccion" onclick="abrirSeccion('contactos')">📞 Contactos</div>
+            <div class="seccion" onclick="abrirSeccion('reservas')">✈️ Reservas</div>
+            <div class="seccion" onclick="abrirSeccion('galeria')">📸 Galería</div>
+            <div class="seccion" onclick="abrirSeccion('conversor')">💱 Conversor</div>
+        </div>
+
+        <div id="contenido-seccion"></div>
+    </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

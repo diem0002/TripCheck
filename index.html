@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Viajes</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Mis Viajes</h1>
+    </header>
+
+    <main>
+        <div id="viajes-container" class="grid"></div>
+        <button id="nuevo-viaje-btn">+ Nuevo Viaje</button>
+    </main>
+
+    <!-- Modal para crear viaje -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Nuevo Viaje</h2>
+            <label>Nombre:</label>
+            <input type="text" id="nombre-viaje">
+            <label>País:</label>
+            <input type="text" id="pais-viaje">
+            <label>Fecha inicio:</label>
+            <input type="date" id="fecha-inicio">
+            <label>Fecha fin:</label>
+            <input type="date" id="fecha-fin">
+            <button id="guardar-viaje">Guardar</button>
+            <button id="cerrar-modal">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>
