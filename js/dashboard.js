@@ -197,39 +197,69 @@ function renderGastos() {
 }
 
 // -------------------- Diccionario --------------------
-function renderDiccionario() {
-    if(!viaje.frases) viaje.frases=[];
+async function renderTraductor() {
     contenido.innerHTML = `
-        <h2>Diccionario / Frases</h2>
-        <input type="text" id="esp" placeholder="Español">
-        <input type="text" id="otro" placeholder="Idioma local">
-        <button id="agregar-frase">Agregar</button>
-        <ul id="lista-frases"></ul>
+        <h2>Traductor</h2>
+        <textarea id="texto-origen" placeholder="Escribí aquí..." rows="4"></textarea>
+        <div style="display:flex; gap:10px; margin:0.5rem 0;">
+            <select id="from-lang" class="select-traductor"></select>
+            <select id="to-lang" class="select-traductor"></select>
+        </div>
+        <button id="traducir-btn">Traducir</button>
+        <div class="polaroid" style="margin-top:1rem;">
+            <p id="resultado-traduccion" style="margin:0; font-weight:bold;">Resultado aparecerá aquí</p>
+        </div>
     `;
-    const lista = document.getElementById('lista-frases');
-    document.getElementById('agregar-frase').onclick = ()=>{
-        const esp = document.getElementById('esp').value.trim();
-        const otro = document.getElementById('otro').value.trim();
-        if(!esp||!otro) return;
-        viaje.frases.push({esp,otro});
-        saveViajeActual(viaje);
-        document.getElementById('esp').value=''; document.getElementById('otro').value='';
-        actualizarFrases();
+
+    const fromSelect = document.getElementById('from-lang');
+    const toSelect = document.getElementById('to-lang');
+
+    const idiomas = {
+        "es":"Español",
+        "en":"Inglés",
+        "fr":"Francés",
+        "de":"Alemán",
+        "it":"Italiano",
+        "pt":"Portugués",
+        "tr":"Turco",
+        "ru":"Ruso",
+        "ja":"Japonés",
+        "zh":"Chino"
     };
-    function actualizarFrases(){
-        lista.innerHTML='';
-        viaje.frases.forEach((f,i)=>{
-            const li=document.createElement('li');
-            li.textContent=`${f.esp} → ${f.otro}`;
-            const del=document.createElement('button');
-            del.textContent='❌';
-            del.onclick=()=>{viaje.frases.splice(i,1); saveViajeActual(viaje); actualizarFrases();};
-            li.appendChild(del);
-            lista.appendChild(li);
-        });
+
+    Object.entries(idiomas).forEach(([code,name])=>{
+        const opt1 = document.createElement('option');
+        opt1.value = code; opt1.textContent = name;
+        fromSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = code; opt2.textContent = name;
+        toSelect.appendChild(opt2);
+    });
+
+    fromSelect.value = 'es';
+    toSelect.value = 'en';
+
+    document.getElementById('traducir-btn').onclick = async ()=>{
+        const texto = document.getElementById('texto-origen').value.trim();
+        const from = fromSelect.value;
+        const to = toSelect.value;
+        if(!texto) return alert("Escribí algo para traducir");
+
+        try{
+            const textoEncode = encodeURIComponent(texto);
+            const res = await fetch(`https://lingva.ml/api/v1/${from}/${to}/${textoEncode}`);
+            const data = await res.json();
+            document.getElementById('resultado-traduccion').textContent = data.translation;
+        } catch(err){
+            alert('Error al traducir: '+err.message);
+        }
     }
-    actualizarFrases();
 }
+
+
+renderTraductor();
+
 
 // -------------------- Contactos --------------------
 function renderContactos() {
@@ -335,30 +365,83 @@ function renderGaleria(){
     };
 
     function actualizarGaleria(){
-        galeria.innerHTML='';
-        viaje.fotos.forEach(f=>{
-            const div=document.createElement('div');
-            div.className='polaroid';
-            div.innerHTML=`<img src="${f.src}" alt="${f.titulo}"><h4>${f.titulo}</h4><p>${f.descripcion}</p>`;
-            galeria.appendChild(div);
-        });
-    }
+    galeria.innerHTML='';
+    viaje.fotos.forEach((f,i)=>{
+        const div=document.createElement('div');
+        div.className='polaroid';
+        div.innerHTML=`
+            <img src="${f.src}" alt="${f.titulo}">
+            <h4>${f.titulo}</h4>
+            <p>${f.descripcion}</p>
+        `;
+        // Botón eliminar
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '❌';
+        delBtn.style.marginTop = '5px';
+        delBtn.onclick = ()=>{
+            viaje.fotos.splice(i,1); // Elimina la foto
+            saveViajeActual(viaje);
+            actualizarGaleria();
+        };
+        div.appendChild(delBtn);
+        galeria.appendChild(div);
+    });
+}
+
     actualizarGaleria();
 }
 
 // -------------------- Conversor --------------------
-function renderConversor(){
+async function renderConversor(){
     contenido.innerHTML=`
         <h2>Conversor de Moneda</h2>
         <input type="number" id="monto-conv" placeholder="Cantidad">
-        <input type="number" id="tasa" placeholder="Tasa de cambio">
+        <select id="from-conv"></select>
+        <select id="to-conv"></select>
         <button id="convertir">Convertir</button>
         <p>Resultado: <span id="resultado-conv">0</span></p>
     `;
-    document.getElementById('convertir').onclick=()=>{
-        const monto=parseFloat(document.getElementById('monto-conv').value);
-        const tasa=parseFloat(document.getElementById('tasa').value);
-        if(isNaN(monto)||isNaN(tasa)) return alert('Ingrese números válidos');
-        document.getElementById('resultado-conv').textContent=(monto*tasa).toFixed(2);
-    };
+
+    const fromSelect = document.getElementById('from-conv');
+    const toSelect = document.getElementById('to-conv');
+
+    // Obtener lista de monedas
+    const monedasRes = await fetch('https://api.frankfurter.app/currencies');
+    const monedas = await monedasRes.json();
+
+    // Llenar selects
+    for(const [codigo, nombre] of Object.entries(monedas)){
+        const opt1 = document.createElement('option');
+        opt1.value = codigo;
+        opt1.textContent = `${codigo} - ${nombre}`;
+        fromSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = codigo;
+        opt2.textContent = `${codigo} - ${nombre}`;
+        toSelect.appendChild(opt2);
+    }
+
+    // Opciones por defecto
+    fromSelect.value = 'USD';
+    toSelect.value = 'EUR';
+
+    // Conversión
+    document.getElementById('convertir').onclick = async ()=>{
+        const monto = parseFloat(document.getElementById('monto-conv').value);
+        const from = fromSelect.value;
+        const to = toSelect.value;
+        if(isNaN(monto)) return alert('Ingrese un monto válido');
+
+        try{
+            const res = await fetch(`https://api.frankfurter.app/latest?amount=${monto}&from=${from}&to=${to}`);
+            const data = await res.json();
+            const resultado = data.rates[to];
+            document.getElementById('resultado-conv').textContent = resultado.toFixed(2);
+        }catch(err){
+            alert('Error al convertir: ' + err.message);
+        }
+    }
 }
+
+

@@ -169,3 +169,19 @@ ul li button { padding:0.2rem 0.5rem; font-size:0.8rem; border-radius:6px; }
     .grid, .secciones-grid { grid-template-columns: 1fr; }
     .tarjeta, .seccion { width:100%; }
 }
+/* Selects estilizados */
+.select-traductor {
+    flex:1;
+    padding:0.5rem;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:0.9rem;
+    background:white;
+    cursor:pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.select-traductor:hover {
+    transform: scale(1.02);
+    border-color:#48a9e6;
+}
