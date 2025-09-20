@@ -4,6 +4,44 @@ const contenido = document.getElementById('contenido-seccion');
 const viajeID = localStorage.getItem('viajeActivo');
 let viaje = getViaje(viajeID);
 
+function resizeImage(file, maxWidth = 300, maxHeight = 300) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if(width > height) {
+                    if(width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if(height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convertimos a base64 comprimido (JPEG, 0.7 calidad)
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                resolve(dataUrl);
+            };
+        };
+        reader.onerror = reject;
+    });
+}
+
 if (!viaje) {
     alert('Viaje no encontrado');
     window.location.href = 'index.html';
@@ -418,12 +456,13 @@ function renderGaleria(){
         const desc=descInput.value.trim();
         if(!file||!titulo) return;
         const reader=new FileReader();
-        reader.onload=()=>{
-            viaje.fotos.push({src:reader.result,titulo,descripcion:desc});
-            saveViajeActual(viaje);
-            input.value=''; tituloInput.value=''; descInput.value='';
-            actualizarGaleria();
-        };
+        resizeImage(file).then(dataUrl => {
+    viaje.fotos.push({src: dataUrl, titulo, descripcion: desc});
+    saveViajeActual(viaje);
+    input.value=''; tituloInput.value=''; descInput.value='';
+    actualizarGaleria();
+});
+
         reader.readAsDataURL(file);
     };
 
