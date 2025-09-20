@@ -28,45 +28,107 @@ function abrirSeccion(seccion) {
 
 // -------------------- Equipaje --------------------
 function renderEquipaje() {
-    contenido.innerHTML = `
-        <h2>Checklist de Equipaje</h2>
-        <input type="text" id="nuevo-item" placeholder="Agregar objeto">
-        <button id="agregar-item">Agregar</button>
-        <ul id="lista-equipaje"></ul>
-    `;
-    const lista = document.getElementById('lista-equipaje');
-    const input = document.getElementById('nuevo-item');
-    const btn = document.getElementById('agregar-item');
+    contenido.innerHTML = '';
 
-    function actualizarLista() {
-        lista.innerHTML = '';
-        viaje.equipaje.forEach((item, i) => {
+    const categorias = {
+        "Documentos": ["Pasaporte", "ID", "Boleto de avión", "Visa", "Seguro de viaje"],
+        "Ropa": ["Camisetas", "Pantalones", "Ropa interior", "Calcetines", "Chaqueta", "Zapatos cómodos", "Sandalias"],
+        "Higiene": ["Cepillo de dientes", "Pasta de dientes", "Jabón", "Champú", "Desodorante", "Toalla"],
+        "Tecnología": ["Cargador", "Auriculares", "Adaptador de enchufe", "Teléfono", "Powerbank", "Laptop/Tablet"],
+        "Salud": ["Medicamentos", "Protector solar", "Repelente", "Botiquín básico"],
+        "Extras": ["Mochila pequeña", "Gafas de sol", "Gorra/sombrero", "Botella de agua", "Snacks"]
+    };
+
+    Object.entries(categorias).forEach(([cat, items]) => {
+        const divCat = document.createElement('div');
+        divCat.className = 'categoria-equipaje';
+        divCat.style.maxWidth = '500px';
+        divCat.style.margin = '20px auto';
+        divCat.innerHTML = `<h3 style="text-align:center; margin-bottom:10px;">${cat}</h3><ul class="lista-items" style="list-style:none; padding:0;"></ul>`;
+        const ul = divCat.querySelector('.lista-items');
+
+        items.forEach(itemNombre => {
+            let item = viaje.equipaje.find(e => e.nombre === itemNombre && e.categoria === cat);
+            if (!item) {
+                item = { categoria: cat, nombre: itemNombre, completo: false };
+                viaje.equipaje.push(item);
+            }
+
             const li = document.createElement('li');
-            li.textContent = item;
+            li.style.display = 'flex';
+            li.style.alignItems = 'center';
+            li.style.justifyContent = 'space-between';
+            li.style.padding = '8px 10px';
+            li.style.borderBottom = '1px solid #ccc';
+            li.style.minHeight = '40px'; // altura uniforme
+
+            const leftDiv = document.createElement('div');
+            leftDiv.style.display = 'flex';
+            leftDiv.style.alignItems = 'center';
+            leftDiv.style.gap = '10px';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = item.completo || false;
+            checkbox.style.width = '18px';
+            checkbox.style.height = '18px';
+            checkbox.onchange = () => { item.completo = checkbox.checked; saveViajeActual(viaje); };
+            const span = document.createElement('span');
+            span.textContent = item.nombre;
+            span.style.wordBreak = 'break-word';
+            leftDiv.appendChild(checkbox);
+            leftDiv.appendChild(span);
+
             const del = document.createElement('button');
             del.textContent = '❌';
+            del.style.height = '30px';
+            del.style.minWidth = '30px';
+            del.style.cursor = 'pointer';
             del.onclick = () => {
-                viaje.equipaje.splice(i,1);
+                viaje.equipaje.splice(viaje.equipaje.indexOf(item), 1);
                 saveViajeActual(viaje);
-                actualizarLista();
+                renderEquipaje();
             };
-            li.appendChild(del);
-            lista.appendChild(li);
-        });
-    }
 
-    btn.onclick = () => {
-        const val = input.value.trim();
-        if(!val) return;
-        viaje.equipaje.push(val);
+            li.appendChild(leftDiv);
+            li.appendChild(del);
+            ul.appendChild(li);
+        });
+
+        contenido.appendChild(divCat);
+    });
+
+    // --- Agregar nuevo item ---
+    const divAgregar = document.createElement('div');
+    divAgregar.className = 'agregar-item-global';
+    divAgregar.style.maxWidth = '500px';
+    divAgregar.style.margin = '20px auto';
+    divAgregar.innerHTML = `
+        <h3 style="text-align:center; margin-bottom:10px;">Agregar nuevo item</h3>
+        <input type="text" id="nuevo-item-texto" placeholder="Nombre del item" style="width:65%; margin-right:5px; padding:5px;">
+        <select id="categoria-item-nuevo" style="width:30%; margin-right:5px; padding:5px;"></select>
+        <button id="agregar-item-global-btn" style="padding:5px 10px;">Agregar</button>
+    `;
+    const selectCat = divAgregar.querySelector('#categoria-item-nuevo');
+    Object.keys(categorias).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        selectCat.appendChild(opt);
+    });
+
+    divAgregar.querySelector('#agregar-item-global-btn').onclick = () => {
+        const nombre = document.getElementById('nuevo-item-texto').value.trim();
+        const cat = selectCat.value;
+        if (!nombre) return alert('Ingrese un nombre de item válido');
+        const item = { categoria: cat, nombre, completo: false };
+        viaje.equipaje.unshift(item); // al inicio
         saveViajeActual(viaje);
-        input.value = '';
-        actualizarLista();
+        renderEquipaje();
     };
-    actualizarLista();
+
+    contenido.appendChild(divAgregar);
 }
 
-// --------------------
 // -------------------- Notas --------------------
 function renderNotas() {
     contenido.innerHTML = `

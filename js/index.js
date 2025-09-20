@@ -16,9 +16,18 @@ function renderViajes() {
             <p>${viaje.pais}</p>
             <p>${viaje.fechaInicio || ''} - ${viaje.fechaFin || ''}</p>
             <button onclick="entrarViaje('${viaje.id}')">Entrar</button>
+            <button onclick="eliminarViaje('${viaje.id}')">❌ Eliminar</button>
+
         `;
         viajesContainer.appendChild(card);
     });
+}
+function eliminarViaje(id) {
+    if (!confirm('¿Seguro que querés eliminar este viaje?')) return;
+    let viajes = getViajes();
+    viajes = viajes.filter(v => v.id !== id);
+    saveViajes(viajes);
+    renderViajes();
 }
 
 function entrarViaje(id) {
